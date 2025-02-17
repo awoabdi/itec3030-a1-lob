@@ -61,6 +61,7 @@ public class Exchange {
 		}
 		
 		//Does the trader exist? Check to see if the trader exists 
+		Trader trader = accounts.getTraderByID(o.getTraderID());
 		if (trader== null) {
 			System.err.println("Order validation: trader with ID " + o.getTraderID() + " not registered with the exchange.");
 			return (false);
@@ -73,7 +74,7 @@ public class Exchange {
 
 		// Does ask trader have position at the security sufficient for a sell?
 		if ((o instanceof Ask) && (pos < o.getQuantity())) {
-			System.err.println("Order validation: seller with ID " + trader.getID() + " not enough shares of " + _________.getTicker() + ": has " + pos + " and tries to sell " + _____.getQuantity());
+			System.err.println("Order validation: seller with ID " + trader.getID() + " not enough shares of " + o.getTicker()  + ": has " + pos + " and tries to sell " + o.getQuantity());
 			return (false);
 		}
 		
@@ -116,7 +117,9 @@ public class Exchange {
 			//If the quanity of the unfulfilled order in the outcome is not zero
 			if (oOutcome.getUnfulfilledOrder().getQuantity() > 0) {
 				//Not the entire ask order was fulfilled, add the unfulfilled part to the ask half-book 
-				 book.getBids().addOrder(oOutcome.getUnfulfilledOrder());
+				book.getAsks().addOrder(oOutcome.getUnfulfilledOrder());
+
+			
 			}			
 		}
 
@@ -150,7 +153,7 @@ public class Exchange {
 			accounts.getTraderAccount(t.getSeller()).applyFee(sellerFee);
 ;
 			//Apply the trade payment to the account balance of the seller (they earned money)
-			accounts.getTraderAccount(t.getSeller()).updateBalance(t.getValue());;
+			accounts.getTraderAccount(t.getSeller()).updateBalance(t.getValue());
 			//Deduct the sold stocks from the position of the seller
 			accounts.getTraderAccount(t.getSeller()).updatePosition(t.getSecurity().getTicker(), -t.getQuantity());
 			
